@@ -1,0 +1,19 @@
+.map-container{ 
+    width: 100%; 
+    height: auto; 
+}
+.street-view-container{ 
+    height: 650px; 
+    width: 100%; 
+}
+#map{
+    height: 480px;
+    min-width: 100%;
+}
+#street-view{
+    height: 100%;
+    min-width: 100%;
+}
+.map-icon{
+    height: 40px;
+}
