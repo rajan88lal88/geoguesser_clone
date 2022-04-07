@@ -2,7 +2,7 @@
 
 //Set up some of our variables.
 var map; //Will contain map object.
-var marker = false; ////Has the user plotted their location marker? 
+var marker = false, marker2 = false, gameRunning = true; ////Has the user plotted their location marker? 
 
 //Function called to initialize / create the map.
 //This is called when the page has loaded.
@@ -44,25 +44,27 @@ function initMap() {
     //Listen for any clicks on the map.
     google.maps.event.addListener(map, 'click', function (event) {
         //Get the location that the user clicked.
-        var clickedLocation = event.latLng;
-        //If the marker hasn't been added.
-        if (marker === false) {
-            //Create the marker.
-            marker = new google.maps.Marker({
-                position: clickedLocation,
-                map: map,
-                draggable: true //make it draggable
-            });
-            //Listen for drag events!
-            google.maps.event.addListener(marker, 'dragend', function (event) {
-                markerLocation();
-            });
-        } else {
-            //Marker has already been added, so just change its location.
-            marker.setPosition(clickedLocation);
+        if (gameRunning==true) {
+            var clickedLocation = event.latLng;
+            //If the marker hasn't been added.
+            if (marker === false) {
+                //Create the marker.
+                marker = new google.maps.Marker({
+                    position: clickedLocation,
+                    map: map,
+                    draggable: false //make it draggable
+                });
+                //Listen for drag events!
+                google.maps.event.addListener(marker, 'dragend', function (event) {
+                    markerLocation();
+                });
+            } else {
+                //Marker has already been added, so just change its location.
+                marker.setPosition(clickedLocation);
+            }
+            //Get the marker's location.
+            markerLocation();
         }
-        //Get the marker's location.
-        markerLocation();
     });
     panorama = new google.maps.StreetViewPanorama(
         document.getElementById("street-view"),
@@ -129,6 +131,7 @@ function removeLine() {
 result = document.getElementById("distance");
 
 function calculate() {
+    gameRunning = false;
     if (selectedLat && selectedLong && !locationSelected) {
         locationSelected = true;
         flightPath = new google.maps.Polyline({
@@ -140,6 +143,12 @@ function calculate() {
             strokeColor: "#FF0000",
             strokeOpacity: 1.0,
             strokeWeight: 2,
+        });
+        userLocation = new google.maps.LatLng(userLat, userLong);
+        marker2 = new google.maps.Marker({
+            position: userLocation,
+            map: map,
+            draggable: false //make it draggable
         });
         var distanceInMeters = google.maps.geometry.spherical.computeDistanceBetween(
             new google.maps.LatLng({ lat: userLat, lng: userLong }),
@@ -153,9 +162,11 @@ function calculate() {
 
 function removeMarker(){
     marker.setMap(null);
+    marker2.setMap(null);
 }
 
 function newGame() {
+    gameRunning = true;
     removeLine();
     removeMarker();
     result.value = "";
